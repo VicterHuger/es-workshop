@@ -1,0 +1,15 @@
+{
+  "name": "workshop_event_sourcing",
+  "version": "1.0.0",
+  "description": "Simple usage of event sourcing designer pattern with CQRS applied for a monolitic project 'GIT' re do project",
+  "repository": "git@github.com:VicterHuger/es-workshop.git",
+  "author": "Victor Hugo Simões <victorhugobs@eq.ufrj.br>",
+  "license": "MIT",
+  "scripts": {
+    "prettier": "prettier --write './src'",
+    "prettier:check": "prettier --check './src'",
+    "test:unit": "jest --config jest.config.unit.ts",
+    "test:functional": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate --skip-seed && dotenv -e .env.test -- jest --config jest.config.functional.ts",
+    "test": "yarn run test:unit && yarn run test:functional"
+  }
+}
