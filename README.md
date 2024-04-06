@@ -31,9 +31,13 @@
 
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Install](#install)
+  - [Starting Project](#starting-project)
   - [Environment Variables](#environment-variables)
   - [Test](#test)
+  - [Other Scripts](#other-scripts)
+- [Consulting Material](#consulting-material)
+- [Acknowledgements ](#acknowledgements)
+- [Authors](#authors)
 
 # Getting Started
 
@@ -146,13 +150,17 @@ yarn test
 
 </br>
 
-## Acknowledgements
+# Consulting Material
+
+- [Slides](https://docs.google.com/presentation/d/1_mtgSEB_RgW6F6hIsp798YAR8bf1bk2z51k6ta_W9k0/edit?usp=sharing)
+
+# Acknowledgements
 
 - [Awesome Badges](https://github.com/Envoy-VC/awesome-badges)
 
 </br>
 
-## Authors
+# Authors
 
 - [Victor Hugo Simões](https://github.com/VicterHuger)
   <br/>
