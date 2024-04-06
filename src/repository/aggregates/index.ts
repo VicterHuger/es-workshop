@@ -1,0 +1,1 @@
+export { CommitProjectionAgreggate } from './commitProjectionAggregate'
