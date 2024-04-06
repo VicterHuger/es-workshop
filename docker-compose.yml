@@ -1,0 +1,21 @@
+services:
+    db:
+      image: postgres:15.2-alpine3.17
+      restart: unless-stopped
+      env_file:
+        - .env
+      volumes:
+        - db_data:/var/lib/postgresql/data
+        - ./scripts/pg-init:/docker-entrypoint-initdb.d
+      healthcheck:
+        test: ['CMD-SHELL', 'pg_isready -U postgres -d es']
+        interval: 1s
+        timeout: 1s
+        retries: 30
+      ports:
+        - 5435:5432
+      command: ['postgres', '-c', 'log_statement=all', '-c', 'log_destination=stderr']
+
+volumes:
+  db_data:
+    driver: local
