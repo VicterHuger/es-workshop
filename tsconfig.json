@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "allowJs": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/constants": ["constants/index.ts"],
+      "@/constants/*": ["constants/*"],
+      "@/factories/*": ["../prisma/factories/*"],
+      "@/repository/*": ["repository/*"],
+      "@/repository": ["repository/index.ts"],
+      "@/types": ["types/index.ts"],
+      "@/types/*": ["types/*"],
+      "@/utils/*": ["utils/*"]
+    },
+    "plugins": [
+      {
+        "name": "@typescript-eslint/eslint-plugin"
+      }
+    ]
+  },
+  "include": [ "**/*.ts"],
+  "exclude": ["node_modules", "build", "prisma/generated"]
+}
