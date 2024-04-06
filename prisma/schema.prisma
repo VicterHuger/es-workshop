@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator" // visualize at https://dbdiagram.io/d
+}
+
+generator factories {
+  provider = "prisma-factory"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Events {
+  id        String   @id @default(cuid())
+  streamId  String   @default(cuid())
+  type      String   @db.Text
+  payload   Json     @db.JsonB
+  createdAt DateTime @default(now())
+  version   Int
+  actor     String?
+
+  @@unique([version, streamId])
+  @@index([streamId])
+  @@map("events")
+}
