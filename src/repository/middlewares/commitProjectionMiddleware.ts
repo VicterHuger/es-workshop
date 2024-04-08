@@ -15,10 +15,27 @@ export class CommitProjectionMiddleware extends DomainMiddleware {
 
       const state = replayed.getState()
 
+      let selector = ''
+      if (!state?.id) {
+        for (const event of context.events) {
+          const normalizedEvent = event as unknown as Event & Record<string, unknown>
+
+          if (
+            typeof normalizedEvent?.commit === 'object' &&
+            normalizedEvent?.commit &&
+            'id' in normalizedEvent.commit &&
+            typeof normalizedEvent?.commit.id === 'string'
+          ) {
+            selector = normalizedEvent?.commit?.id
+            break
+          }
+        }
+      }
+
       context.projections.push({
         collectionName: 'commitProjection',
         data: state,
-        selector: context.events[0]?.streamId,
+        selector: state?.id || selector,
       })
 
       break
