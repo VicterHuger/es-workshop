@@ -32,15 +32,13 @@ export class UpdateMessageCommitCommand extends Command {
     const state = aggreagate.getState()
 
     const isMessageChanged = state?.message !== this.message
-    let newVersion = version
 
     if (isMessageChanged && state?.message) {
-      events.push(new CommitMessageRemoved(this.streamId, newVersion, this.actor))
-      newVersion++
+      events.push(new CommitMessageRemoved(this.streamId, version, this.actor))
     }
 
     if (isMessageChanged && this.message) {
-      events.push(new CommitMessageAdded(this.streamId, newVersion, this.message, this.actor))
+      events.push(new CommitMessageAdded(this.streamId, events.length + version, this.message, this.actor))
     }
 
     return events
