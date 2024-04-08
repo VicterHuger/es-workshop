@@ -5,7 +5,8 @@ import { Command, Event } from '@/utils/event_sourcing'
 export class CreateCommitCommand extends Command {
   constructor(
     private actor: string,
-    private message: string
+    private message: string,
+    private branch: { id: string; name: string }
   ) {
     super()
   }
@@ -23,7 +24,7 @@ export class CreateCommitCommand extends Command {
   protected async execute(version: number): Promise<Event[]> {
     const streamId = cuid()
 
-    const commitCreated = new CommitCreated(streamId, version, this.actor)
+    const commitCreated = new CommitCreated(streamId, version, this.branch, this.actor)
 
     const commitMessageAdded = new CommitMessageAdded(streamId, version + 1, this.message, this.actor)
 
