@@ -3,11 +3,12 @@ import { Aggregate } from '@/utils/event_sourcing'
 
 type State = {
   message?: string | null
+  id: string
 }
 
 export class CommitProjectionAgreggate extends Aggregate<State> {
-  public CommitCreated(_event: CommitCreated) {
-    this.state = {}
+  public CommitCreated(event: CommitCreated) {
+    this.state = { id: event.streamId }
   }
 
   public CommitMessageAdded(event: CommitMessageAdded) {
