@@ -1,5 +1,6 @@
 import { CommitProjectionAgreggate } from './aggregates'
-import { CreateCommitCommand } from './commands'
+import { CreateCommitCommand, UpdateMessageCommitCommand } from './commands'
+import { CommitFetcher } from './fetchers'
 import { CommitProjectionMiddleware } from './middlewares/commitProjectionMiddleware'
 import { ContextInitializerMiddleware } from './middlewares/contextInitializer'
 import { PersistenceMiddleware } from './middlewares/persistenceMiddleware'
@@ -27,4 +28,15 @@ export async function CreateCommit(actor: string, message: string): Promise<void
   const createCommitCommand = new CreateCommitCommand(actor, message).withAggregate(commitProjectionAgreggate)
 
   await createDommain(createCommitCommand).run()
+}
+
+//EDITAR MENSAGEM DO COMMIT
+export async function UpdateMessageCommit(streamId: string, actor: string, message: string): Promise<void> {
+  const fetcher = new CommitFetcher(streamId)
+  const commitProjectionAgreggate = new CommitProjectionAgreggate().withFetcher(fetcher)
+  const updateCommitCommand = new UpdateMessageCommitCommand(streamId, actor, message).withAggregate(
+    commitProjectionAgreggate
+  )
+
+  await createDommain(updateCommitCommand).run()
 }
