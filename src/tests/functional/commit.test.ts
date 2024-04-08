@@ -1,23 +1,62 @@
 import { CreateCommit, UpdateMessageCommit } from '@/repository'
+import { cuid } from '@/utils/cuid'
 import { prisma } from '@/utils/prisma'
 
 describe('COMMIT', () => {
-  it('criar commit', async () => {
+  it('criar commit com branch ja criada', async () => {
     const actor = 'email@email.com'
     const message = 'Meu commit'
-    await CreateCommit(actor, message)
+    const branchBeforeUpdate = await prisma.branch.create({ data: { countCommits: 8, name: 'branch old' } })
+    const branch = { id: branchBeforeUpdate.id, name: branchBeforeUpdate.name }
+
+    await Promise.all([
+      prisma?.events.create({
+        data: {
+          type: 'BranchCreated',
+          streamId: branch.id,
+          version: 1,
+          actor: 'email@email.com',
+          payload: {},
+        },
+      }),
+
+      prisma?.events.create({
+        data: {
+          type: 'BranchNameAdded',
+          streamId: branch.id,
+          version: 2,
+          actor: 'email@email.com',
+          payload: { name: branch.name },
+        },
+      }),
+    ])
+
+    await CreateCommit(actor, message, branch)
 
     const events = await prisma?.events.findMany({})
 
-    const commit = await prisma.commitProjection.findFirst({})
-
-    expect(events[0]).toMatchObject({
-      type: 'CommitCreated',
+    expect(events?.[0]).toMatchObject({
+      type: 'BranchCreated',
       streamId: expect.any(String),
       version: 1,
       actor: 'email@email.com',
     })
-    expect(events[1]).toMatchObject({
+    expect(events?.[1]).toMatchObject({
+      type: 'BranchNameAdded',
+      streamId: expect.any(String),
+      version: 2,
+      payload: { name: branch.name },
+      actor: 'email@email.com',
+    })
+
+    expect(events[2]).toMatchObject({
+      type: 'CommitCreated',
+      streamId: expect.any(String),
+      version: 1,
+      actor: 'email@email.com',
+      payload: { branch },
+    })
+    expect(events[3]).toMatchObject({
       type: 'CommitMessageAdded',
       streamId: expect.any(String),
       version: 2,
@@ -25,8 +64,10 @@ describe('COMMIT', () => {
       actor: 'email@email.com',
     })
 
-    console.log('events', events)
-    console.log('commit', commit)
+    const branchDb = await prisma.branch.findUnique({ where: { id: branch.id } })
+
+    expect(branchDb?.name).toBe(branch.name)
+    expect(branchDb?.countCommits).toBe(9)
   })
 
   it('editar commit', async () => {
@@ -35,7 +76,13 @@ describe('COMMIT', () => {
 
     const commit = await prisma.commitProjection.create({ data: { message } })
     const commitCreatedEvent = await prisma.events.create({
-      data: { type: 'CommitCreated', version: 1, payload: {}, actor, streamId: commit.id },
+      data: {
+        type: 'CommitCreated',
+        version: 1,
+        payload: { branch: { id: cuid(), name: 'branch' } },
+        actor,
+        streamId: commit.id,
+      },
     })
     const commitAddedMessageEvent = await prisma.events.create({
       data: { type: 'CommitMessageAdded', version: 2, payload: { message }, actor, streamId: commit.id },
@@ -76,9 +123,6 @@ describe('COMMIT', () => {
     })
 
     expect(commitUpdate?.message).toBe(newMessage)
-
-    console.log('events', events)
-    console.log('commitUpdate', commitUpdate)
   })
 
   it('should not create new events and not update the commit with the same already informed', async () => {
@@ -87,7 +131,13 @@ describe('COMMIT', () => {
 
     const commit = await prisma.commitProjection.create({ data: { message } })
     const commitCreatedEvent = await prisma.events.create({
-      data: { type: 'CommitCreated', version: 1, payload: {}, actor, streamId: commit.id },
+      data: {
+        type: 'CommitCreated',
+        version: 1,
+        payload: { branch: { id: cuid(), name: 'branch' } },
+        actor,
+        streamId: commit.id,
+      },
     })
     const commitAddedMessageEvent = await prisma.events.create({
       data: { type: 'CommitMessageAdded', version: 2, payload: { message }, actor, streamId: commit.id },
@@ -117,9 +167,6 @@ describe('COMMIT', () => {
     expect(events[2]).toBeUndefined()
 
     expect(commitUpdate?.message).toBe(message)
-
-    console.log('events', events)
-    console.log('commitUpdate', commitUpdate)
   })
 
   it('should throw Commit not created, if there is no events', async () => {
