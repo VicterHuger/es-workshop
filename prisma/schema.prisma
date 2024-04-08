@@ -34,3 +34,15 @@ model CommitProjection {
   id      String @id @default(cuid())
   message String
 }
+
+model Branch {
+  id           String @id @default(cuid())
+  name         String
+  countCommits Int
+}
+
+model BranchProjection {
+  id           String @id @default(cuid())
+  name         String
+  countCommits Int
+}
