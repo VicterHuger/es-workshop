@@ -5,14 +5,14 @@ import { Command, Event } from '@/utils/event_sourcing'
 export class CreateCommitCommand extends Command {
   constructor(
     private actor: string,
-    private mensagem: string
+    private message: string
   ) {
     super()
   }
 
   protected preValidate(): void {
-    if (this.mensagem.length <= 3) {
-      throw new Error('Mensagem muito curta, fazer escrever maior que 3 characteres')
+    if (this.message.length <= 3) {
+      throw new Error('message muito curta, fazer escrever maior que 3 characteres')
     }
   }
 
@@ -25,7 +25,7 @@ export class CreateCommitCommand extends Command {
 
     const commitCreated = new CommitCreated(streamId, version, this.actor)
 
-    const commitMessageAdded = new CommitMessageAdded(streamId, version + 1, this.mensagem, this.actor)
+    const commitMessageAdded = new CommitMessageAdded(streamId, version + 1, this.message, this.actor)
 
     const events: Event[] = [commitCreated, commitMessageAdded]
 

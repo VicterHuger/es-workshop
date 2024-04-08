@@ -6,7 +6,7 @@ export class CommitMessageAdded implements Event {
   constructor(
     public streamId: string,
     public version: number,
-    public mensagem: string,
+    public message: string,
     public actor?: string
   ) {}
 }

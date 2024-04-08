@@ -2,7 +2,7 @@ import { CommitCreated, CommitMessageAdded } from '../events'
 import { Aggregate } from '@/utils/event_sourcing'
 
 type State = {
-  mensagem?: string
+  message?: string
 }
 
 export class CommitProjectionAgreggate extends Aggregate<State> {
@@ -11,6 +11,6 @@ export class CommitProjectionAgreggate extends Aggregate<State> {
   }
 
   public CommitMessageAdded(event: CommitMessageAdded) {
-    this.state.mensagem = event.mensagem
+    this.state.message = event.message
   }
 }

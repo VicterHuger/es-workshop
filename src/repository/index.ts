@@ -1,27 +1,30 @@
 import { CommitProjectionAgreggate } from './aggregates'
 import { CreateCommitCommand } from './commands'
-import { Event } from '@/utils/event_sourcing'
+import { CommitProjectionMiddleware } from './middlewares/commitProjectionMiddleware'
+import { ContextInitializerMiddleware } from './middlewares/contextInitializer'
+import { PersistenceMiddleware } from './middlewares/persistenceMiddleware'
+import { Command, EventSourcingDomain } from '@/utils/event_sourcing'
+
+function createDommain(command: Command): EventSourcingDomain {
+  const domain = new EventSourcingDomain()
+
+  domain.registerAggregate(new CommitProjectionAgreggate())
+
+  domain.registerMiddleware(new ContextInitializerMiddleware())
+  // adicionar middlewares aqui
+  domain.registerMiddleware(new CommitProjectionMiddleware())
+
+  domain.registerMiddleware(new PersistenceMiddleware())
+
+  domain.withCommand(command)
+
+  return domain
+}
 
 //CRIAR COMMIT
-export async function CreateCommit(
-  actor: string,
-  mensagem: string
-): Promise<{ events: Event[]; state: Record<string, string> }> {
+export async function CreateCommit(actor: string, message: string): Promise<void> {
   const commitProjectionAgreggate = new CommitProjectionAgreggate()
-  const createCommitCommand = new CreateCommitCommand(actor, mensagem).withAggregate(commitProjectionAgreggate)
+  const createCommitCommand = new CreateCommitCommand(actor, message).withAggregate(commitProjectionAgreggate)
 
-  const events = await createCommitCommand.run()
-
-  for (const event of events) {
-    const { streamId, type, version, actor, ...payload } = event
-    await prisma?.events.create({
-      data: { streamId, type, version, actor, payload },
-    })
-  }
-
-  const state = commitProjectionAgreggate.getState()
-
-  //TODO: ADD LOGIC TO ADD STATE FOR TABLE
-
-  return { events, state }
+  await createDommain(createCommitCommand).run()
 }

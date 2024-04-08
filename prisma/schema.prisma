@@ -29,3 +29,8 @@ model Events {
   @@index([streamId])
   @@map("events")
 }
+
+model CommitProjection {
+  id      String @id @default(cuid())
+  message String
+}

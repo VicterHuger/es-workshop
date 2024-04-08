@@ -1,16 +1,13 @@
 import Aggregate from './aggreagate'
 import Command from './command'
 import Event from './event'
+import { DomainMiddleware } from './middleware'
 
 export interface DomainContext {
   affectedAggregates: Map<string, Aggregate<unknown>>
   events: Event[]
   command: Command
   fetchedEventsfromCommandAggregate: Event[]
-}
-
-export abstract class DomainMiddleware {
-  public abstract apply(context: DomainContext): Promise<DomainContext>
 }
 
 export default class EventSourcingDomain {
